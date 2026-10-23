@@ -14,7 +14,7 @@ const { endpoint } = Astro.props;
   </div>
   <div class="contact-form__field">
     <label class="contact-form__label" for="contact-email">メールアドレス<span class="contact-form__required">必須</span></label>
-    <input class="contact-form__input" id="contact-email" name="email" type="email" autocomplete="email" required aria-describedby="contact-email-error" />
+    <input class="contact-form__input" id="contact-email" name="email" type="email" autocomplete="email" spellcheck="false" required aria-describedby="contact-email-error" />
     <p class="contact-form__error" id="contact-email-error">メールアドレスの形式で入力してください。</p>
   </div>
   <div class="contact-form__field">

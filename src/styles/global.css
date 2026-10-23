@@ -24,6 +24,10 @@
     font: inherit;
     color: inherit;
   }
+
+  :where(a, button) {
+    touch-action: manipulation;
+  }
 }
 
 @layer base {
@@ -48,6 +52,15 @@
     line-height: calc(28 / 16);
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+  }
+
+  html {
+    /* 固定ヘッダー(64px)の下に、ページ内リンクの移動先やフォーカスが隠れないようにする */
+    scroll-padding-block-start: 80px;
+  }
+
+  :where(h1, h2, h3) {
+    text-wrap: balance;
   }
 
   :root[data-theme="light"] {
