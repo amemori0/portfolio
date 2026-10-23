@@ -1,23 +1,59 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
 ---
 
 <BaseLayout title="ページが見つかりません">
   <section class="not-found l-container" aria-labelledby="not-found-title">
+    <p class="not-found__code" aria-hidden="true">404</p>
     <h1 id="not-found-title" class="not-found__title">ページが見つかりません</h1>
-    <p>URLが変わったか、ページが削除された可能性があります。</p>
-    <p><a href="/">トップページへ戻る</a></p>
+    <p class="not-found__text">URLが間違っているか、ページが移動・削除された可能性があります。トップページか作品一覧から探してください。</p>
+    <ul class="not-found__actions" role="list">
+      <li>
+        <a class="button" data-variant="primary" href="/">
+          トップページへ
+          <Icon name="arrow-right" class="button__icon" />
+        </a>
+      </li>
+      <li>
+        <a class="button" data-variant="secondary" href="/#works">作品一覧を見る</a>
+      </li>
+    </ul>
   </section>
 </BaseLayout>
 
 <style>
   .not-found {
     display: grid;
-    gap: 16px;
+    justify-items: center;
+    gap: var(--space-16);
     padding-block: var(--space-section);
+    text-align: center;
+  }
+
+  .not-found__code {
+    color: var(--color-accent);
+    font-family: var(--font-heading);
+    font-size: clamp(4rem, 3rem + 5svi, 7rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.08em;
   }
 
   .not-found__title {
     font-size: clamp(1.5rem, 1.2rem + 1.5svi, 2.25rem);
+  }
+
+  .not-found__text {
+    max-inline-size: min(32em, 100%);
+    color: var(--color-muted);
+  }
+
+  .not-found__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-12);
+    margin-block-start: var(--space-16);
   }
 </style>
