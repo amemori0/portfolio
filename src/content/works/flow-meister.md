@@ -2,7 +2,7 @@
 title: Flow Meister
 status: in-progress
 summary: Next.js(App Router)と TypeScript で制作中のコーポレートサイトです。ニュース一覧・詳細やお問い合わせフォームまでを実装しています。
-role: コーディング(スクール課題)
+role: コーディング
 tech: [Next.js(App Router), TypeScript, CSS Modules, Swiper]
 order: 3
 images:
