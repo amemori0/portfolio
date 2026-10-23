@@ -1,0 +1,33 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="footer__inner l-container">
+    <a class="footer__link" href="https://github.com/amemori0">GitHub</a>
+    <p class="footer__copy"><small>&copy; {year} <span translate="no">Shuri Amemori</span></small></p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-block-start: var(--space-section);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-block: 24px;
+    color: var(--color-muted);
+  }
+
+  .footer__link {
+    display: grid;
+    place-items: center;
+    min-block-size: 44px;
+  }
+</style>

@@ -1,0 +1,105 @@
+@layer reset, base, utilities;
+
+@layer reset {
+  :where(*, *::before, *::after) {
+    box-sizing: border-box;
+  }
+
+  :where(body, h1, h2, h3, h4, p, figure, ul, ol, dl, dd) {
+    margin: 0;
+  }
+
+  :where(ul[role="list"], ol[role="list"]) {
+    padding: 0;
+    list-style: none;
+  }
+
+  :where(img, svg, picture) {
+    display: block;
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+
+  :where(button, input, textarea) {
+    font: inherit;
+    color: inherit;
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+
+    --color-bg: light-dark(#fafafa, #161616);
+    --color-surface: light-dark(#ffffff, #1f1f1f);
+    --color-text: light-dark(#1a1a1a, #ececec);
+    --color-muted: light-dark(#5c5c5c, #a8a8a8);
+    --color-border: light-dark(#dcdcdc, #3a3a3a);
+    --color-accent: light-dark(#b35c00, #4fd1c5);
+    --color-device: light-dark(#2b2b2b, #0c0c0c);
+    --focus-ring: 2px solid var(--color-accent);
+
+    --content-width: min(1120px, 100% - 2 * clamp(16px, 4svi, 40px));
+    --space-section: clamp(64px, 10svi, 120px);
+    --radius: 8px;
+    --leading-trim: calc((1em - 1lh) / 2);
+
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    line-height: calc(28 / 16);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    min-block-size: 100svb;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-break: strict;
+  }
+
+  a {
+    color: inherit;
+    text-underline-offset: 0.2em;
+  }
+
+  :focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  .l-container {
+    inline-size: var(--content-width);
+    margin-inline: auto;
+  }
+
+  .u-sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

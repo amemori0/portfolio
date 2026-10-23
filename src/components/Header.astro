@@ -1,0 +1,88 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+
+const NAV = [
+  { href: "/#works", label: "Works" },
+  { href: "/#about", label: "About" },
+  { href: "/#contact", label: "Contact" },
+];
+---
+
+<header class="header">
+  <div class="header__inner l-container">
+    <a class="header__logo" href="/" translate="no">Shuri Amemori</a>
+    <nav class="header__nav" aria-label="メイン">
+      <ul class="header__list" role="list">
+        {
+          NAV.map(item => (
+            <li>
+              <a class="header__link" href={item.href}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-block-end: 1px solid var(--color-border);
+    background-color: color-mix(in srgb, var(--color-bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+  }
+
+  .header__inner {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 2svi, 32px);
+    min-block-size: 64px;
+  }
+
+  .header__logo {
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+  }
+
+  .header__nav {
+    margin-inline-start: auto;
+  }
+
+  .header__list {
+    display: flex;
+    gap: clamp(4px, 1.5svi, 24px);
+  }
+
+  .header__link {
+    display: grid;
+    place-items: center;
+    min-block-size: 44px;
+    padding-inline: 8px;
+    text-decoration: none;
+  }
+
+  @media (any-hover: hover) {
+    .header__link:hover {
+      text-decoration: underline;
+    }
+  }
+
+  @media (width < 480px) {
+    .header__logo {
+      font-size: 1rem;
+    }
+
+    .header__link {
+      padding-inline: 4px;
+      font-size: 0.875rem;
+    }
+  }
+</style>
