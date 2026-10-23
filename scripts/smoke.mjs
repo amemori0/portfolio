@@ -23,6 +23,15 @@ try {
       if (overflow > 0) failures.push(`[${label}] ${path}: 横スクロールが ${overflow}px 発生`);
     }
 
+    // 作品カードは画像(モックアップ)の上を押しても詳細ページへ移動する
+    await page.goto(BASE + "/");
+    const media = page.locator(".work-card__media").first();
+    await media.scrollIntoViewIfNeeded();
+    // 画像の上にはリンクの当たり判定が重なっているため、要素ではなく座標を押す(利用者と同じ操作)
+    const box = await media.boundingBox();
+    if (box) await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await page.waitForURL(/\/works\/[^/]+\/$/, { timeout: 5000 }).catch(() => failures.push(`[${label}] カードの画像を押しても詳細ページへ移動しない`));
+
     // OSがライトならライトで始まり、トグルでダークになり、再読み込み後も保たれる
     await page.goto(BASE + "/");
     if ((await page.getAttribute("html", "data-theme")) !== "light") failures.push(`[${label}] 初期テーマがOS設定(light)になっていない`);

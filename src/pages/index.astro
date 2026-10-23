@@ -44,7 +44,11 @@ const SKILLS = [
   <section id="about" class="section l-container" aria-labelledby="about-title">
     <h2 id="about-title" class="section__title">About</h2>
     <div class="about">
-      <p class="about__text">2027年卒業予定。WordPressのオリジナルテーマ制作を中心に作品を作ってきました。現在はReact / Next.js と TypeScript でのアプリ開発に取り組んでいます。</p>
+      <div class="about__text">
+        <p>情報系の学部で、コンピューターサイエンスを中心に学んでいる2年生です。</p>
+        <p>授業では、チームでアプリのアイデアを考え、開発して発表するチーム開発に取り組んでいます。現在はそのチームのリーダーとして、開発を進めています。</p>
+        <p>授業の外では、WordPressのオリジナルテーマ制作を中心に作品を作ってきました。現在はReact / Next.js と TypeScript でのアプリ開発にも取り組んでいます。</p>
+      </div>
       <h3 class="about__subtitle">スキル</h3>
       <dl class="skills">
         {
@@ -84,9 +88,10 @@ const SKILLS = [
 
   .hero__eyebrow {
     color: var(--color-accent);
-    font-size: 0.875rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
   }
 
@@ -99,15 +104,17 @@ const SKILLS = [
   }
 
   .hero__name {
-    font-size: clamp(2rem, 1.4rem + 3svi, 3.5rem);
-    line-height: calc(64 / 56);
-    letter-spacing: 0.04em;
+    font-size: clamp(2.25rem, 1.5rem + 3.5svi, 4rem);
+    line-height: calc(72 / 64);
+    letter-spacing: 0.08em;
   }
 
   .hero__roman {
     color: var(--color-muted);
-    font-size: clamp(1rem, 0.9rem + 0.5svi, 1.25rem);
-    letter-spacing: 0.08em;
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 1.1rem + 0.7svi, 1.75rem);
+    font-weight: 600;
+    letter-spacing: 0.12em;
   }
 
   .section {
@@ -118,8 +125,9 @@ const SKILLS = [
   }
 
   .section__title {
-    font-size: clamp(1.5rem, 1.2rem + 1.5svi, 2.25rem);
-    letter-spacing: 0.04em;
+    font-size: clamp(2rem, 1.5rem + 2.2svi, 3.25rem);
+    line-height: calc(56 / 52);
+    letter-spacing: 0.06em;
   }
 
   .works-list {
@@ -138,8 +146,14 @@ const SKILLS = [
     max-inline-size: min(48em, 100%);
   }
 
+  .about__text {
+    display: grid;
+    gap: 1em;
+  }
+
   .about__subtitle {
-    font-size: 1.125rem;
+    margin-block-start: 16px;
+    font-size: 1.5rem;
   }
 
   .skills {

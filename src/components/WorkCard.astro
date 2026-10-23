@@ -55,8 +55,8 @@ const href = `/works/${work.id}/`;
 
   .work-card__title {
     order: 2;
-    font-size: 1.125rem;
-    line-height: calc(28 / 18);
+    font-size: 1.375rem;
+    line-height: calc(32 / 22);
   }
 
   .work-card__summary {
@@ -83,11 +83,12 @@ const href = `/works/${work.id}/`;
     text-decoration: none;
   }
 
-  /* カード全体をクリック領域にする */
+  /* カード全体をクリック領域にする。モックアップ内の position 付き要素より前面に出すため z-index を付ける */
   .work-card__link::after {
     content: "";
     position: absolute;
     inset: 0;
+    z-index: 1;
     border-radius: var(--radius);
   }
 

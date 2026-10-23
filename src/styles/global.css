@@ -43,6 +43,9 @@
     --color-device: light-dark(#2b2b2b, #0c0c0c);
     --focus-ring: 2px solid var(--color-accent);
 
+    /* 見出し用。英字は Cormorant Garamond、日本語は しっぽり明朝 で表示する */
+    --font-heading: "Cormorant Garamond", "Shippori Mincho", serif;
+
     --content-width: min(1120px, 100% - 2 * clamp(16px, 4svi, 40px));
     --space-section: clamp(64px, 10svi, 120px);
     --radius: 8px;
@@ -66,6 +69,8 @@
   }
 
   :where(h1, h2, h3) {
+    font-family: var(--font-heading);
+    font-weight: 600;
     text-wrap: balance;
   }
 

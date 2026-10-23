@@ -25,7 +25,12 @@ const { endpoint } = Astro.props;
   <!-- スパム対策: 人には見えない項目。値が入っていたらFormspreeが破棄する -->
   <input class="u-sr-only" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" />
   <input type="hidden" name="_subject" value="ポートフォリオサイトからのお問い合わせ" />
-  <button class="contact-form__submit" type="submit">送信する</button>
+  <button class="contact-form__submit" type="submit">
+    <span class="contact-form__submit-label">送信する</span>
+    <svg class="contact-form__submit-icon" aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14M13 6l6 6-6 6"></path>
+    </svg>
+  </button>
   <p class="contact-form__result" data-contact-result role="status"></p>
 </form>
 
@@ -127,20 +132,49 @@ const { endpoint } = Astro.props;
   }
 
   .contact-form__submit {
-    justify-self: start;
-    min-block-size: 48px;
-    padding-inline: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+    gap: 12px;
+    min-inline-size: min(280px, 100%);
+    min-block-size: 60px;
+    padding-inline: 48px;
     border: 0;
     border-radius: 999px;
     background-color: var(--color-text);
     color: var(--color-bg);
+    font-size: 1.0625rem;
     font-weight: 700;
+    letter-spacing: 0.08em;
     cursor: pointer;
   }
 
   .contact-form__submit:disabled {
     opacity: 0.6;
     cursor: wait;
+  }
+
+  /* ホバーでボタンを少し浮かせ、矢印を右へ動かす(transform だけを動かす) */
+  @media (any-hover: hover) {
+    .contact-form__submit {
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+
+    .contact-form__submit-icon {
+      transition: transform 0.25s ease;
+    }
+
+    .contact-form__submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px color-mix(in srgb, var(--color-text) 25%, transparent);
+    }
+
+    .contact-form__submit:hover:not(:disabled) .contact-form__submit-icon {
+      transform: translateX(4px);
+    }
   }
 
   .contact-form__result[data-state="error"] {
