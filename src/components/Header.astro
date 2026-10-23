@@ -51,6 +51,7 @@ const NAV = [
     font-weight: 600;
     letter-spacing: 0.04em;
     text-decoration: none;
+    white-space: nowrap;
   }
 
   .header__nav {
@@ -68,22 +69,45 @@ const NAV = [
     min-block-size: 44px;
     padding-inline: 8px;
     text-decoration: none;
+    white-space: nowrap;
   }
 
   @media (any-hover: hover) {
     .header__link:hover {
-      text-decoration: underline;
+      text-decoration-line: underline;
+      text-decoration-color: var(--color-accent);
+      text-decoration-thickness: 2px;
     }
   }
 
   @media (width < 480px) {
+    .header__inner {
+      gap: 4px;
+    }
+
     .header__logo {
-      font-size: 1.25rem;
+      font-size: 1.125rem;
+    }
+
+    .header__list {
+      gap: 0;
     }
 
     .header__link {
-      padding-inline: 4px;
-      font-size: 0.875rem;
+      padding-inline: 6px;
+      font-size: 0.8125rem;
+    }
+  }
+
+  @media (width < 360px) {
+    .header__logo {
+      font-size: 1rem;
+      letter-spacing: 0;
+    }
+
+    .header__link {
+      padding-inline: 3px;
+      font-size: 0.75rem;
     }
   }
 </style>

@@ -96,6 +96,14 @@
     text-underline-offset: 0.2em;
   }
 
+  /* ホバー時の下線はアクセント色にそろえる */
+  @media (any-hover: hover) {
+    a:hover {
+      text-decoration-color: var(--color-accent);
+      text-decoration-thickness: 2px;
+    }
+  }
+
   :focus-visible {
     outline: var(--focus-ring);
     outline-offset: 3px;

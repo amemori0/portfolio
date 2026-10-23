@@ -10,22 +10,25 @@ const FORMSPREE_ENDPOINT = "https://formspree.io/f/mljjerbq";
 const works = sortWorks(await getCollection("works"));
 
 const SKILLS = [
-  { name: "HTML / CSS(SCSS)", note: "FLOCSS + BEM、アクセシビリティを意識したマークアップ" },
+  { name: "HTML / CSS (SCSS)", note: "FLOCSS + BEM、アクセシビリティを意識したマークアップ" },
   { name: "JavaScript", note: "GSAP・Swiper.jsを使った動きの実装" },
   { name: "PHP / WordPress", note: "オリジナルテーマ開発、ACFを使った運用設計" },
   { name: "TypeScript / React / Next.js", note: "学習中。App Routerで作品を制作中" },
-  { name: "開発環境", note: "Vite、Docker(@wordpress/env)、Git / GitHub" },
+  { name: "UI / UX", note: "学習中" },
+  { name: "Tools", note: "Vite、Docker(@wordpress/env)、Git / GitHub" },
 ];
 ---
 
 <BaseLayout title="Shuri Amemori Portfolio">
-  <section class="hero l-container" aria-labelledby="hero-title">
-    <hgroup class="hero__heading">
-      <p class="hero__eyebrow" lang="en">Portfolio</p>
-      <h1 id="hero-title" class="hero__name">雨森 守浬</h1>
-      <p class="hero__roman" translate="no" lang="en">Shuri Amemori</p>
-    </hgroup>
-    <HeroVisual works={works} />
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero__inner l-container">
+      <hgroup class="hero__heading">
+        <p class="hero__eyebrow" lang="en">Portfolio</p>
+        <h1 id="hero-title" class="hero__name">雨森 守浬</h1>
+        <p class="hero__roman" translate="no" lang="en">Shuri Amemori</p>
+      </hgroup>
+      <HeroVisual works={works} />
+    </div>
   </section>
 
   <section id="works" class="section l-container" aria-labelledby="works-title">
@@ -41,25 +44,27 @@ const SKILLS = [
     </ul>
   </section>
 
-  <section id="about" class="section l-container" aria-labelledby="about-title">
-    <h2 id="about-title" class="section__title">About</h2>
-    <div class="about">
-      <div class="about__text">
-        <p>情報処理科の2年生で、2027年卒業予定です。コンピューターサイエンスを中心に学んでいます。</p>
-        <p>授業では、チームでアプリのアイデアを考え、開発して発表するチーム開発に取り組んでいます。現在はそのチームのリーダーとして、開発を進めています。</p>
-        <p>授業の外では、WordPressのオリジナルテーマ制作を中心に作品を作ってきました。現在はReact / Next.js と TypeScript でのアプリ開発にも取り組んでいます。</p>
+  <section id="about" class="band" aria-labelledby="about-title">
+    <div class="section l-container">
+      <h2 id="about-title" class="section__title">About</h2>
+      <div class="about">
+        <div class="about__text">
+          <p>情報処理科の2年生で、2027年卒業予定です。コンピューターサイエンスを中心に学んでいます。</p>
+          <p>最近は学校の授業で、自分たちで企画したアプリを開発して発表するチーム開発に取り組んでいます。現在はそのチームのリーダーとして、開発を進めています。</p>
+          <p>授業の外では、WordPressのオリジナルテーマ制作を中心に作品を作ってきました。現在は UI/UX や TypeScript、React / Next.js を学習しています。</p>
+        </div>
+        <h3 class="about__subtitle" lang="en">Skills</h3>
+        <dl class="skills">
+          {
+            SKILLS.map(skill => (
+              <div class="skills__item">
+                <dt class="skills__name" lang="en">{skill.name}</dt>
+                <dd class="skills__note">{skill.note}</dd>
+              </div>
+            ))
+          }
+        </dl>
       </div>
-      <h3 class="about__subtitle">スキル</h3>
-      <dl class="skills">
-        {
-          SKILLS.map(skill => (
-            <div class="skills__item">
-              <dt class="skills__name">{skill.name}</dt>
-              <dd class="skills__note">{skill.note}</dd>
-            </div>
-          ))
-        }
-      </dl>
     </div>
   </section>
 
@@ -72,12 +77,42 @@ const SKILLS = [
 
 <style>
   .hero {
+    position: relative;
+    isolation: isolate;
+    /* 傾けたスマホや背景の光が画面の端からはみ出しても、横スクロールを出さない */
+    overflow-x: clip;
+  }
+
+  /* 背景のドット柄。中央から外へ向かって薄くする */
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(color-mix(in srgb, var(--color-text) 18%, transparent) 1px, transparent 1.5px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse 70% 80% at 60% 45%, #000 20%, transparent 75%);
+  }
+
+  /* 左上のアクセント色の淡い光 */
+  .hero::after {
+    content: "";
+    position: absolute;
+    top: -20%;
+    left: -10%;
+    z-index: -1;
+    inline-size: 60%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--color-accent) 22%, transparent), transparent);
+    filter: blur(40px);
+  }
+
+  .hero__inner {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
     align-items: center;
     gap: 32px;
-    /* 傾けたスマホが画面の端からはみ出しても、横スクロールを出さない */
-    overflow-x: clip;
     padding-block: clamp(40px, 8svi, 96px) clamp(24px, 4svi, 48px);
   }
 
@@ -96,7 +131,7 @@ const SKILLS = [
   }
 
   @media (width < 720px) {
-    .hero {
+    .hero__inner {
       grid-template-columns: 1fr;
       justify-items: center;
       text-align: center;
@@ -138,6 +173,18 @@ const SKILLS = [
 
   .works-list > li {
     display: grid;
+  }
+
+  /* 背景色を変えた全幅の帯。白一色が続かないようにする */
+  .band {
+    margin-block-start: var(--space-section);
+    padding-block-end: var(--space-section);
+    border-block: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+  }
+
+  .band > .section {
+    padding-block-start: var(--space-section);
   }
 
   .about {

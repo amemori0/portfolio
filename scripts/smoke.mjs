@@ -10,6 +10,7 @@ try {
   for (const [label, options] of Object.entries({
     desktop: { viewport: { width: 1280, height: 800 } },
     mobile: { viewport: { width: 390, height: 844 }, isMobile: true },
+    narrow: { viewport: { width: 320, height: 568 }, isMobile: true },
   })) {
     const context = await browser.newContext({ ...options, colorScheme: "light" });
     const page = await context.newPage();
@@ -21,6 +22,11 @@ try {
       await page.goto(BASE + path);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       if (overflow > 0) failures.push(`[${label}] ${path}: 横スクロールが ${overflow}px 発生`);
+      // ヘッダーは1行に収まる(ロゴやメニューが折り返すと高さが増える)
+      const headerHeight = await page.evaluate(() => document.querySelector(".header")?.getBoundingClientRect().height ?? 0);
+      if (headerHeight > 72) failures.push(`[${label}] ${path}: ヘッダーが折り返している(高さ ${headerHeight}px)`);
+      const toggleRight = await page.evaluate(() => document.querySelector("[data-theme-toggle]")?.getBoundingClientRect().right ?? 0);
+      if (toggleRight > (options.viewport?.width ?? 0)) failures.push(`[${label}] ${path}: トグルが画面の外にはみ出している`);
     }
 
     // 作品カードは画像(モックアップ)の上を押しても詳細ページへ移動する

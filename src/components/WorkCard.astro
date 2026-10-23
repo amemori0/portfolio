@@ -107,11 +107,13 @@ const href = `/works/${work.id}/`;
     }
 
     .work-card:has(.work-card__link:hover) {
-      border-color: var(--color-text);
+      border-color: var(--color-accent);
     }
 
     .work-card:has(.work-card__link:hover) .work-card__link {
-      text-decoration: underline;
+      text-decoration-line: underline;
+      text-decoration-color: var(--color-accent);
+      text-decoration-thickness: 2px;
     }
   }
 </style>
