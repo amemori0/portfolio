@@ -1,0 +1,76 @@
+---
+import type { CollectionEntry } from "astro:content";
+import PhoneFrame from "./PhoneFrame.astro";
+
+interface Props {
+  works: CollectionEntry<"works">[];
+}
+
+// 扇状に並べるのは先頭の3作品まで。中央を一番手前にする
+const phones = Astro.props.works.slice(0, 3);
+const POSITIONS = ["left", "center", "right"] as const;
+---
+
+<div class="hero-visual" aria-hidden="true">
+  <span class="hero-visual__glow"></span>
+  {
+    phones.map((work, index) => (
+      <div class="hero-visual__phone" data-position={POSITIONS[index]}>
+        <PhoneFrame image={work.data.images.mobile} alt="" sizes="(width < 720px) 30vw, 200px" loading="eager" />
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .hero-visual {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    inline-size: 100%;
+    max-inline-size: 520px;
+    padding-block: 24px;
+    padding-inline: 6%;
+  }
+
+  @media (width < 720px) {
+    .hero-visual {
+      max-inline-size: 320px;
+    }
+  }
+
+  .hero-visual__glow {
+    position: absolute;
+    inset: 10% 5%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--color-accent) 35%, transparent), transparent);
+    filter: blur(24px);
+  }
+
+  .hero-visual__phone {
+    position: relative;
+    grid-row: 1;
+  }
+
+  .hero-visual__phone[data-position="left"] {
+    grid-column: 1 / 2;
+    z-index: 1;
+    margin-inline-end: -30%;
+    rotate: -10deg;
+    translate: 0 8%;
+  }
+
+  .hero-visual__phone[data-position="center"] {
+    grid-column: 2 / 3;
+    z-index: 2;
+  }
+
+  .hero-visual__phone[data-position="right"] {
+    grid-column: 3 / 4;
+    z-index: 1;
+    margin-inline-start: -30%;
+    rotate: 10deg;
+    translate: 0 8%;
+  }
+</style>

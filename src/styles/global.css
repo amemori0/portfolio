@@ -59,6 +59,12 @@
     scroll-padding-block-start: 80px;
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
   :where(h1, h2, h3) {
     text-wrap: balance;
   }

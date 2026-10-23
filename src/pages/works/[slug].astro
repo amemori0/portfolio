@@ -1,5 +1,5 @@
 ---
-import { getCollection, render, type CollectionEntry } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import DeviceMockup from "../../components/DeviceMockup.astro";
 import StatusBadge from "../../components/StatusBadge.astro";
@@ -14,7 +14,6 @@ interface Props {
 }
 
 const { work } = Astro.props;
-const { Content } = await render(work);
 const { title, summary, role, tech, links, images, status } = work.data;
 ---
 
@@ -75,10 +74,6 @@ const { title, summary, role, tech, links, images, status } = work.data;
         )
       }
     </dl>
-
-    <div class="work__body">
-      <Content />
-    </div>
   </article>
 </BaseLayout>
 
@@ -170,35 +165,6 @@ const { title, summary, role, tech, links, images, status } = work.data;
       background-color: var(--color-text);
       color: var(--color-bg);
     }
-  }
-
-  .work__body {
-    display: grid;
-    gap: 16px;
-    max-inline-size: min(48em, 100%);
-  }
-
-  .work__body :global(h2) {
-    margin-block-start: 24px;
-    font-size: clamp(1.25rem, 1.1rem + 0.8svi, 1.625rem);
-  }
-
-  .work__body :global(h3) {
-    margin-block-start: 12px;
-    font-size: 1.125rem;
-  }
-
-  .work__body :global(ul) {
-    display: grid;
-    gap: 8px;
-    padding-inline-start: 1.25em;
-  }
-
-  .work__body :global(code) {
-    padding: 0.1em 0.35em;
-    border-radius: 4px;
-    background-color: var(--color-surface);
-    font-size: 0.9em;
   }
 
   @media (width < 640px) {

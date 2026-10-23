@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import WorkCard from "../components/WorkCard.astro";
 import ContactForm from "../components/ContactForm.astro";
+import HeroVisual from "../components/HeroVisual.astro";
 import { sortWorks } from "../lib/works";
 
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/mljjerbq";
@@ -20,12 +21,11 @@ const SKILLS = [
 <BaseLayout title="Shuri Amemori Portfolio">
   <section class="hero l-container" aria-labelledby="hero-title">
     <hgroup class="hero__heading">
+      <p class="hero__eyebrow" lang="en">Portfolio</p>
       <h1 id="hero-title" class="hero__name">雨森 守浬</h1>
       <p class="hero__roman" translate="no" lang="en">Shuri Amemori</p>
     </hgroup>
-    <p class="hero__lead">
-      デザイン再現とアクセシビリティを土台に、CMSの運用設計や開発ツールの自作まで領域を広げてきました。作って終わりではなく、運用する人・書く人・次に開発する人の手間をどう減らすかを考えて実装するのが強みです。
-    </p>
+    <HeroVisual works={works} />
   </section>
 
   <section id="works" class="section l-container" aria-labelledby="works-title">
@@ -69,13 +69,33 @@ const SKILLS = [
 <style>
   .hero {
     display: grid;
-    gap: 24px;
-    padding-block: clamp(56px, 10svi, 120px) clamp(32px, 6svi, 72px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
+    align-items: center;
+    gap: 32px;
+    /* 傾けたスマホが画面の端からはみ出しても、横スクロールを出さない */
+    overflow-x: clip;
+    padding-block: clamp(40px, 8svi, 96px) clamp(24px, 4svi, 48px);
   }
 
   .hero__heading {
     display: grid;
     gap: 4px;
+  }
+
+  .hero__eyebrow {
+    color: var(--color-accent);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  @media (width < 720px) {
+    .hero {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      text-align: center;
+    }
   }
 
   .hero__name {
@@ -88,11 +108,6 @@ const SKILLS = [
     color: var(--color-muted);
     font-size: clamp(1rem, 0.9rem + 0.5svi, 1.25rem);
     letter-spacing: 0.08em;
-  }
-
-  .hero__lead {
-    max-inline-size: min(40em, 100%);
-    font-size: clamp(1rem, 0.95rem + 0.3svi, 1.125rem);
   }
 
   .section {

@@ -26,11 +26,11 @@
 ## ページ構成
 
 - `/` トップ
-  1. ヒーロー: 名前「雨森 守浬 / Shuri Amemori」と一言の紹介(`dev/docs/portfolio-strategy.md` の30秒版をもとに下書き)
+  1. ヒーロー: 名前「雨森 守浬 / Shuri Amemori」と、3作品のスマホ画面を扇状に並べた装飾(飾りなので `aria-hidden`。WCAG 2.2.2 に配慮して動かさない)
   2. 作品一覧: カードを並べる(PCは3列、狭い画面では1〜2列)。カードはモックアップ画像・状態ラベル・タイトル・概要・技術タグ
   3. 自己紹介とスキル
   4. お問い合わせフォーム
-- `/works/<slug>/` 作品詳細: PC+スマホのモックアップ、目的、担当範囲、使った技術、工夫した点(実装→理由→効果)、デモ・GitHubへのリンク(あるものだけ)
+- `/works/<slug>/` 作品詳細: PC+スマホのモックアップ、担当範囲、使った技術、デモ・GitHubへのリンク(あるものだけ)。目的や工夫した点は各リポジトリのREADMEに任せる(2026-10-23 ユーザー指示)
 - `/404`
 
 ヘッダー: サイト名(名前)、ナビ(Works / About / Contact)、ライト/ダークのトグル。参考サイト TAKLOG(https://www.tak-dcxi.com/)の、白黒基調・色数の少なさ・トグルスイッチ・カードグリッドの雰囲気に寄せる。
@@ -52,13 +52,13 @@
 | images.desktop | image | ○ | PCのスクリーンショット |
 | images.mobile | image | ○ | スマホのスクリーンショット |
 
-本文(Markdown)は詳細ページの「目的」「工夫した点」などの見出しと文章。READMEに書いてある内容だけを使い、READMEにない実績は書かない。
+本文は書かない(frontmatterのみ)。説明は各リポジトリのREADMEに任せる。
 
 作品の追加手順: スクリーンショットを撮る → Markdownを1つ足す → push。
 
 ## デバイスモックアップ
 
-- ノートPCとスマホの枠はCSSで描き、中に `<Image>`(astro:assets)でスクリーンショットをはめる。WebPに変換し、表示サイズに合わせた `srcset` を出す
+- ノートPCとスマホの枠はCSSで描き(スマホは Dynamic Island・側面ボタン付きの iPhone 風。`PhoneFrame` に切り出してトップの装飾と共用)、中に `<Image>`(astro:assets)でスクリーンショットをはめる。WebPに変換し、表示サイズに合わせた `srcset` を出す
 - 一覧ではPCとスマホを重ねた1つの図、詳細では大きく表示
 - 画像の `alt` は「TETOTEのトップページをPCで表示した画面」のように、何の画面かを書く
 - 撮影: `npm run capture` で Playwright が各作品の公開URLを開き、PC 1440×900 / スマホ 390×844 で撮って `src/assets/works/<slug>/` に保存する。撮影対象のURLはスクリプト内の一覧で管理する
@@ -67,6 +67,7 @@
 ## ライト/ダークモード
 
 - 初期値はOSの設定(`prefers-color-scheme`)。トグルで切り替えたら `localStorage` に保存する(読み書きは try/catch で囲み、使えない環境でもOSの設定で表示する)
+- スクロールは `scroll-behavior: smooth`(`prefers-reduced-motion: no-preference` のときだけ)
 - `<html data-theme="light|dark">` と `color-scheme` で切り替え、色は `light-dark()` で定義する
 - 表示のちらつきを防ぐため、`<head>` 内のインラインスクリプトで描画前に `data-theme` を決める
 - トグルは `<button aria-pressed>` + `aria-label`。太陽/月のアイコンは装飾なので `aria-hidden="true"`
