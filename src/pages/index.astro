@@ -2,8 +2,10 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import WorkCard from "../components/WorkCard.astro";
+import ContactForm from "../components/ContactForm.astro";
 import { sortWorks } from "../lib/works";
 
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/mljjerbq";
 const works = sortWorks(await getCollection("works"));
 
 const SKILLS = [
@@ -60,6 +62,7 @@ const SKILLS = [
   <section id="contact" class="section l-container" aria-labelledby="contact-title">
     <h2 id="contact-title" class="section__title">Contact</h2>
     <p class="contact__lead">お問い合わせは、下記のフォームからお送りください。</p>
+    <ContactForm endpoint={FORMSPREE_ENDPOINT} />
   </section>
 </BaseLayout>
 

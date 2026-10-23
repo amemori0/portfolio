@@ -1,0 +1,149 @@
+---
+interface Props {
+  endpoint: string;
+}
+
+const { endpoint } = Astro.props;
+---
+
+<form class="contact-form" action={endpoint} method="POST" data-contact-form>
+  <div class="contact-form__field">
+    <label class="contact-form__label" for="contact-name">お名前<span class="contact-form__required">必須</span></label>
+    <input class="contact-form__input" id="contact-name" name="name" type="text" autocomplete="name" required aria-describedby="contact-name-error" />
+    <p class="contact-form__error" id="contact-name-error">お名前を入力してください。</p>
+  </div>
+  <div class="contact-form__field">
+    <label class="contact-form__label" for="contact-email">メールアドレス<span class="contact-form__required">必須</span></label>
+    <input class="contact-form__input" id="contact-email" name="email" type="email" autocomplete="email" required aria-describedby="contact-email-error" />
+    <p class="contact-form__error" id="contact-email-error">メールアドレスの形式で入力してください。</p>
+  </div>
+  <div class="contact-form__field">
+    <label class="contact-form__label" for="contact-message">お問い合わせ内容<span class="contact-form__required">必須</span></label>
+    <textarea class="contact-form__input contact-form__textarea" id="contact-message" name="message" rows="6" required aria-describedby="contact-message-error"></textarea>
+    <p class="contact-form__error" id="contact-message-error">お問い合わせ内容を入力してください。</p>
+  </div>
+  <!-- スパム対策: 人には見えない項目。値が入っていたらFormspreeが破棄する -->
+  <input class="u-sr-only" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" />
+  <input type="hidden" name="_subject" value="ポートフォリオサイトからのお問い合わせ" />
+  <button class="contact-form__submit" type="submit">送信する</button>
+  <p class="contact-form__result" data-contact-result role="status"></p>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+  const result = form?.querySelector<HTMLElement>("[data-contact-result]");
+
+  form?.addEventListener("submit", async event => {
+    // required 属性の検証はブラウザが先に行うため、ここに来るのは入力が揃っているときだけ
+    event.preventDefault();
+    const submitButton = form.querySelector<HTMLButtonElement>("[type='submit']");
+    if (!submitButton || !result) return;
+
+    submitButton.disabled = true;
+    result.setAttribute("role", "status");
+    delete result.dataset.state;
+    result.textContent = "送信しています…";
+
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) throw new Error(`Formspree responded ${response.status}`);
+      form.reset();
+      result.dataset.state = "success";
+      result.textContent = "送信しました。お問い合わせありがとうございます。";
+    } catch (error) {
+      console.error(error);
+      result.setAttribute("role", "alert");
+      result.dataset.state = "error";
+      result.textContent = "送信に失敗しました。時間をおいて再度お試しください。";
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+</script>
+
+<style>
+  .contact-form {
+    display: grid;
+    gap: 24px;
+    max-inline-size: min(40em, 100%);
+  }
+
+  .contact-form__field {
+    display: grid;
+    gap: 8px;
+  }
+
+  .contact-form__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+  }
+
+  .contact-form__required {
+    padding: 0 6px;
+    border-radius: 4px;
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    font-size: 0.75rem;
+  }
+
+  .contact-form__input {
+    min-block-size: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background-color: var(--color-surface);
+    font-size: 1rem;
+  }
+
+  .contact-form__textarea {
+    field-sizing: content;
+    min-block-size: 8lh;
+    resize: vertical;
+  }
+
+  .contact-form__input:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 1px;
+  }
+
+  .contact-form__error {
+    display: none;
+    color: light-dark(#b00020, #ff8a80);
+    font-size: 0.875rem;
+  }
+
+  .contact-form__input:user-invalid {
+    border-color: light-dark(#b00020, #ff8a80);
+  }
+
+  .contact-form__field:has(:user-invalid) .contact-form__error {
+    display: block;
+  }
+
+  .contact-form__submit {
+    justify-self: start;
+    min-block-size: 48px;
+    padding-inline: 32px;
+    border: 0;
+    border-radius: 999px;
+    background-color: var(--color-text);
+    color: var(--color-bg);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .contact-form__submit:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .contact-form__result[data-state="error"] {
+    color: light-dark(#b00020, #ff8a80);
+  }
+</style>

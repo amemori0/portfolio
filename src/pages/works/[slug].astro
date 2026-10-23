@@ -1,0 +1,209 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import DeviceMockup from "../../components/DeviceMockup.astro";
+import StatusBadge from "../../components/StatusBadge.astro";
+
+export async function getStaticPaths() {
+  const works = await getCollection("works");
+  return works.map(work => ({ params: { slug: work.id }, props: { work } }));
+}
+
+interface Props {
+  work: CollectionEntry<"works">;
+}
+
+const { work } = Astro.props;
+const { Content } = await render(work);
+const { title, summary, role, tech, links, images, status } = work.data;
+---
+
+<BaseLayout title={title} description={summary}>
+  <article class="work l-container" aria-labelledby="work-title">
+    <nav class="work__breadcrumb" aria-label="パンくずリスト">
+      <ol role="list" class="breadcrumb">
+        <li><a href="/">トップ</a></li>
+        <li><a href="/#works">Works</a></li>
+        <li aria-current="page">{title}</li>
+      </ol>
+    </nav>
+
+    <header class="work__header">
+      <StatusBadge status={status} />
+      <h1 id="work-title" class="work__title">{title}</h1>
+      <p class="work__summary">{summary}</p>
+    </header>
+
+    <DeviceMockup desktop={images.desktop} mobile={images.mobile} title={title} size="large" priority />
+
+    <dl class="work__facts">
+      <div class="work__fact">
+        <dt>担当範囲</dt>
+        <dd>{role}</dd>
+      </div>
+      <div class="work__fact">
+        <dt>使用技術</dt>
+        <dd>
+          <ul class="work__tags" role="list">
+            {tech.map(item => <li class="work__tag">{item}</li>)}
+          </ul>
+        </dd>
+      </div>
+      {
+        (links.demo || links.repo) && (
+          <div class="work__fact">
+            <dt>リンク</dt>
+            <dd>
+              <ul class="work__links" role="list">
+                {links.demo && (
+                  <li>
+                    <a class="work__button" href={links.demo}>
+                      デモサイトを見る<span class="u-sr-only">({title})</span>
+                    </a>
+                  </li>
+                )}
+                {links.repo && (
+                  <li>
+                    <a class="work__button" href={links.repo}>
+                      GitHubでコードを見る<span class="u-sr-only">({title})</span>
+                    </a>
+                  </li>
+                )}
+              </ul>
+            </dd>
+          </div>
+        )
+      }
+    </dl>
+
+    <div class="work__body">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .work {
+    display: grid;
+    gap: clamp(24px, 4svi, 48px);
+    padding-block-start: 24px;
+  }
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+
+  .breadcrumb > li:not(:last-child)::after {
+    content: "/";
+    margin-inline-start: 8px;
+  }
+
+  .work__header {
+    display: grid;
+    justify-items: start;
+    gap: 12px;
+  }
+
+  .work__title {
+    font-size: clamp(1.75rem, 1.3rem + 2svi, 2.75rem);
+    line-height: calc(52 / 44);
+  }
+
+  .work__summary {
+    max-inline-size: min(40em, 100%);
+    color: var(--color-muted);
+  }
+
+  .work__facts {
+    display: grid;
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .work__fact {
+    display: grid;
+    grid-template-columns: 8em 1fr;
+    gap: 8px 24px;
+    padding-block: 16px;
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .work__fact dt {
+    font-weight: 700;
+  }
+
+  .work__tags,
+  .work__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .work__tag {
+    padding: 2px 8px;
+    border-radius: 4px;
+    background-color: var(--color-surface);
+    font-size: 0.875rem;
+  }
+
+  .work__button {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 44px;
+    padding-inline: 20px;
+    border: 1px solid var(--color-text);
+    border-radius: 999px;
+    text-decoration: none;
+  }
+
+  @media (any-hover: hover) {
+    .work__button {
+      transition:
+        background-color 0.2s,
+        color 0.2s;
+    }
+
+    .work__button:hover {
+      background-color: var(--color-text);
+      color: var(--color-bg);
+    }
+  }
+
+  .work__body {
+    display: grid;
+    gap: 16px;
+    max-inline-size: min(48em, 100%);
+  }
+
+  .work__body :global(h2) {
+    margin-block-start: 24px;
+    font-size: clamp(1.25rem, 1.1rem + 0.8svi, 1.625rem);
+  }
+
+  .work__body :global(h3) {
+    margin-block-start: 12px;
+    font-size: 1.125rem;
+  }
+
+  .work__body :global(ul) {
+    display: grid;
+    gap: 8px;
+    padding-inline-start: 1.25em;
+  }
+
+  .work__body :global(code) {
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background-color: var(--color-surface);
+    font-size: 0.9em;
+  }
+
+  @media (width < 640px) {
+    .work__fact {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
