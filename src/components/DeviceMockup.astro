@@ -1,0 +1,95 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  desktop: ImageMetadata;
+  mobile: ImageMetadata;
+  title: string;
+  size?: "card" | "large";
+  priority?: boolean;
+}
+
+const { desktop, mobile, title, size = "card", priority = false } = Astro.props;
+const loading = priority ? "eager" : "lazy";
+const fetchpriority = priority ? "high" : "auto";
+const desktopSizes = size === "large" ? "(width < 1120px) 85vw, 950px" : "(width < 720px) 85vw, 320px";
+const mobileSizes = size === "large" ? "200px" : "80px";
+---
+
+<figure class="device-mockup" data-size={size}>
+  <div class="device-mockup__laptop">
+    <div class="device-mockup__laptop-screen">
+      <Image
+        class="device-mockup__image"
+        src={desktop}
+        alt={`${title}のトップページをPCで表示した画面`}
+        widths={[480, 960, 1440]}
+        sizes={desktopSizes}
+        loading={loading}
+        fetchpriority={fetchpriority}
+      />
+    </div>
+    <div class="device-mockup__laptop-base" aria-hidden="true"></div>
+  </div>
+  <div class="device-mockup__phone">
+    <div class="device-mockup__phone-screen">
+      <Image class="device-mockup__image" src={mobile} alt={`${title}のトップページをスマートフォンで表示した画面`} widths={[200, 400, 780]} sizes={mobileSizes} loading={loading} />
+    </div>
+  </div>
+</figure>
+
+<style>
+  .device-mockup {
+    --_phone-width: 22%;
+
+    position: relative;
+    padding-block-end: 4%;
+    padding-inline-end: 8%;
+  }
+
+  .device-mockup__laptop {
+    container-type: inline-size;
+    container-name: laptop;
+  }
+
+  .device-mockup__laptop-screen {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border: clamp(4px, 1.2cqi, 14px) solid var(--color-device);
+    border-radius: 10px 10px 0 0;
+    background-color: var(--color-device);
+  }
+
+  .device-mockup__laptop-base {
+    block-size: clamp(6px, 2.4cqi, 20px);
+    margin-inline: -5%;
+    border-radius: 0 0 12px 12px;
+    background: linear-gradient(var(--color-device), color-mix(in srgb, var(--color-device) 70%, var(--color-bg)));
+  }
+
+  .device-mockup__phone {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    inline-size: var(--_phone-width);
+    padding: 3%;
+    border-radius: 14% / 7%;
+    background-color: var(--color-device);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+  }
+
+  .device-mockup__phone-screen {
+    aspect-ratio: 390 / 844;
+    overflow: hidden;
+    border-radius: 10% / 5%;
+    background-color: var(--color-bg);
+  }
+
+  .device-mockup__image {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+</style>

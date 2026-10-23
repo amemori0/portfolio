@@ -1,0 +1,153 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import WorkCard from "../components/WorkCard.astro";
+import { sortWorks } from "../lib/works";
+
+const works = sortWorks(await getCollection("works"));
+
+const SKILLS = [
+  { name: "HTML / CSS(SCSS)", note: "FLOCSS + BEM、アクセシビリティを意識したマークアップ" },
+  { name: "JavaScript", note: "GSAP・Swiper.jsを使った動きの実装" },
+  { name: "PHP / WordPress", note: "オリジナルテーマ開発、ACFを使った運用設計" },
+  { name: "TypeScript / React / Next.js", note: "学習中。App Routerで作品を制作中" },
+  { name: "開発環境", note: "Vite、Docker(@wordpress/env)、Git / GitHub" },
+];
+---
+
+<BaseLayout title="Shuri Amemori Portfolio">
+  <section class="hero l-container" aria-labelledby="hero-title">
+    <hgroup class="hero__heading">
+      <h1 id="hero-title" class="hero__name">雨森 守浬</h1>
+      <p class="hero__roman" translate="no" lang="en">Shuri Amemori</p>
+    </hgroup>
+    <p class="hero__lead">
+      デザイン再現とアクセシビリティを土台に、CMSの運用設計や開発ツールの自作まで領域を広げてきました。作って終わりではなく、運用する人・書く人・次に開発する人の手間をどう減らすかを考えて実装するのが強みです。
+    </p>
+  </section>
+
+  <section id="works" class="section l-container" aria-labelledby="works-title">
+    <h2 id="works-title" class="section__title">Works</h2>
+    <ul class="works-list" role="list">
+      {
+        works.map((work, index) => (
+          <li>
+            <WorkCard work={work} priority={index === 0} />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section id="about" class="section l-container" aria-labelledby="about-title">
+    <h2 id="about-title" class="section__title">About</h2>
+    <div class="about">
+      <p class="about__text">2027年卒業予定。WordPressのオリジナルテーマ制作を中心に作品を作ってきました。現在はReact / Next.js と TypeScript でのアプリ開発に取り組んでいます。</p>
+      <h3 class="about__subtitle">スキル</h3>
+      <dl class="skills">
+        {
+          SKILLS.map(skill => (
+            <div class="skills__item">
+              <dt class="skills__name">{skill.name}</dt>
+              <dd class="skills__note">{skill.note}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section id="contact" class="section l-container" aria-labelledby="contact-title">
+    <h2 id="contact-title" class="section__title">Contact</h2>
+    <p class="contact__lead">お問い合わせは、下記のフォームからお送りください。</p>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    gap: 24px;
+    padding-block: clamp(56px, 10svi, 120px) clamp(32px, 6svi, 72px);
+  }
+
+  .hero__heading {
+    display: grid;
+    gap: 4px;
+  }
+
+  .hero__name {
+    font-size: clamp(2rem, 1.4rem + 3svi, 3.5rem);
+    line-height: calc(64 / 56);
+    letter-spacing: 0.04em;
+  }
+
+  .hero__roman {
+    color: var(--color-muted);
+    font-size: clamp(1rem, 0.9rem + 0.5svi, 1.25rem);
+    letter-spacing: 0.08em;
+  }
+
+  .hero__lead {
+    max-inline-size: min(40em, 100%);
+    font-size: clamp(1rem, 0.95rem + 0.3svi, 1.125rem);
+  }
+
+  .section {
+    display: grid;
+    gap: 32px;
+    padding-block-start: var(--space-section);
+    scroll-margin-block-start: 64px;
+  }
+
+  .section__title {
+    font-size: clamp(1.5rem, 1.2rem + 1.5svi, 2.25rem);
+    letter-spacing: 0.04em;
+  }
+
+  .works-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    gap: clamp(16px, 3svi, 32px);
+  }
+
+  .works-list > li {
+    display: grid;
+  }
+
+  .about {
+    display: grid;
+    gap: 24px;
+    max-inline-size: min(48em, 100%);
+  }
+
+  .about__subtitle {
+    font-size: 1.125rem;
+  }
+
+  .skills {
+    display: grid;
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .skills__item {
+    display: grid;
+    grid-template-columns: minmax(10em, 1fr) 2fr;
+    gap: 8px 24px;
+    padding-block: 16px;
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .skills__name {
+    font-weight: 700;
+  }
+
+  .skills__note {
+    color: var(--color-muted);
+  }
+
+  @media (width < 640px) {
+    .skills__item {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

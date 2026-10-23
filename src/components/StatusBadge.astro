@@ -1,0 +1,31 @@
+---
+import { statusLabel, type WorkStatus } from "../lib/works";
+
+interface Props {
+  status: WorkStatus;
+}
+
+const { status } = Astro.props;
+---
+
+<span class="status-badge" data-status={status}>{statusLabel(status)}</span>
+
+<style>
+  .status-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    line-height: calc(20 / 12);
+    font-weight: 700;
+  }
+
+  .status-badge[data-status="published"] {
+    color: var(--color-text);
+  }
+
+  .status-badge[data-status="in-progress"] {
+    color: var(--color-accent);
+  }
+</style>

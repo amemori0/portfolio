@@ -1,0 +1,116 @@
+---
+import type { CollectionEntry } from "astro:content";
+import DeviceMockup from "./DeviceMockup.astro";
+import StatusBadge from "./StatusBadge.astro";
+
+interface Props {
+  work: CollectionEntry<"works">;
+  headingLevel?: 2 | 3;
+  priority?: boolean;
+}
+
+const { work, headingLevel = 3, priority = false } = Astro.props;
+const Heading = `h${headingLevel}` as "h2" | "h3";
+const titleId = `work-${work.id}-title`;
+const href = `/works/${work.id}/`;
+---
+
+<article class="work-card" aria-labelledby={titleId}>
+  <Heading id={titleId} class="work-card__title">
+    <a class="work-card__link" href={href}>{work.data.title}</a>
+  </Heading>
+  <div class="work-card__media">
+    <DeviceMockup desktop={work.data.images.desktop} mobile={work.data.images.mobile} title={work.data.title} priority={priority} />
+  </div>
+  <div class="work-card__meta">
+    <StatusBadge status={work.data.status} />
+  </div>
+  <p class="work-card__summary">{work.data.summary}</p>
+  <ul class="work-card__tags" role="list" aria-label="使用技術">
+    {work.data.tech.map(tech => <li class="work-card__tag">{tech}</li>)}
+  </ul>
+</article>
+
+<style>
+  .work-card {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto auto 1fr auto;
+    gap: 12px;
+    padding: clamp(16px, 2svi, 24px);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background-color: var(--color-surface);
+  }
+
+  /* DOMは見出し始まり、見た目は画像を上にする */
+  .work-card__media {
+    order: 0;
+    padding-block: 8px;
+  }
+
+  .work-card__meta {
+    order: 1;
+  }
+
+  .work-card__title {
+    order: 2;
+    font-size: 1.125rem;
+    line-height: calc(28 / 18);
+  }
+
+  .work-card__summary {
+    order: 3;
+    color: var(--color-muted);
+    font-size: 0.9375rem;
+  }
+
+  .work-card__tags {
+    order: 4;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .work-card__tag {
+    padding: 2px 8px;
+    border-radius: 4px;
+    background-color: var(--color-bg);
+    font-size: 0.75rem;
+  }
+
+  .work-card__link {
+    text-decoration: none;
+  }
+
+  /* カード全体をクリック領域にする */
+  .work-card__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+  }
+
+  .work-card:has(.work-card__link:focus-visible) {
+    outline: var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  .work-card__link:focus-visible {
+    outline: none;
+  }
+
+  @media (any-hover: hover) {
+    .work-card {
+      transition: border-color 0.2s;
+    }
+
+    .work-card:has(.work-card__link:hover) {
+      border-color: var(--color-text);
+    }
+
+    .work-card:has(.work-card__link:hover) .work-card__link {
+      text-decoration: underline;
+    }
+  }
+</style>
