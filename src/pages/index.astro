@@ -9,6 +9,10 @@ import { sortWorks } from "../lib/works";
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/mljjerbq";
 const works = sortWorks(await getCollection("works"));
 
+// Aboutの文章・スキルを書き換えたら、この日付も更新する(YYYY-MM-DD)
+const ABOUT_UPDATED = "2026-10-23";
+const aboutUpdatedLabel = new Intl.DateTimeFormat("ja-JP", { dateStyle: "long", timeZone: "Asia/Tokyo" }).format(new Date(`${ABOUT_UPDATED}T00:00:00+09:00`));
+
 const SKILLS = [
   { name: "HTML / CSS (SCSS)", note: "FLOCSS + BEM、アクセシビリティを意識したマークアップ" },
   { name: "JavaScript", note: "GSAP・Swiper.jsを使った動きの実装" },
@@ -49,6 +53,7 @@ const SKILLS = [
     <div class="section l-container">
       <h2 id="about-title" class="section__title">About</h2>
       <div class="about">
+        <p class="about__updated">最終更新日: <time datetime={ABOUT_UPDATED}>{aboutUpdatedLabel}</time></p>
         <div class="about__text">
           <p>情報処理科の2年生で、2027年卒業予定です。コンピューターサイエンスを中心に学んでいます。</p>
           <p>最近は学校の授業で、自分たちで企画したアプリを開発して発表するチーム開発に取り組んでいます。現在はそのチームのリーダーとして、開発を進めています。</p>
@@ -198,6 +203,13 @@ const SKILLS = [
     display: grid;
     gap: 24px;
     max-inline-size: min(48em, 100%);
+  }
+
+  .about__updated {
+    margin-block-start: calc(-1 * var(--space-16));
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
   }
 
   .about__text {

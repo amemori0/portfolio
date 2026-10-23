@@ -11,6 +11,10 @@
 2. `src/content/works/<slug>.md` を作る(項目は `src/content.config.ts` のスキーマを参照)
 3. `npm run build` が通ることを確認して push する(Cloudflare Pages が自動で公開する)
 
+## Aboutを更新する
+
+`src/pages/index.astro` のAboutの文章やスキルを書き換えたら、同じファイルの先頭にある `ABOUT_UPDATED`(最終更新日)も更新する。
+
 ## 開発
 
 ```bash
