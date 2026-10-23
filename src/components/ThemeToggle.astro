@@ -38,10 +38,12 @@
   .theme-toggle {
     display: grid;
     place-items: center;
-    min-inline-size: 44px;
-    min-block-size: 44px;
+    flex-shrink: 0;
+    min-inline-size: var(--control-height);
+    min-block-size: var(--control-height);
     padding: 0;
     border: 0;
+    border-radius: 999px;
     background: none;
     cursor: pointer;
   }
@@ -49,9 +51,9 @@
   .theme-toggle__track {
     display: flex;
     align-items: center;
-    inline-size: 52px;
-    block-size: 28px;
-    padding: 3px;
+    inline-size: 56px;
+    block-size: 32px;
+    padding: var(--space-4);
     border-radius: 999px;
     background-color: var(--color-accent);
     transition: background-color 0.2s;
@@ -60,8 +62,8 @@
   .theme-toggle__knob {
     display: grid;
     place-items: center;
-    inline-size: 22px;
-    block-size: 22px;
+    inline-size: 24px;
+    block-size: 24px;
     border-radius: 50%;
     background-color: var(--color-surface);
     color: var(--color-text);
@@ -70,6 +72,16 @@
 
   .theme-toggle[aria-pressed="true"] .theme-toggle__knob {
     translate: 24px 0;
+  }
+
+  @media (any-hover: hover) {
+    .theme-toggle:hover .theme-toggle__track {
+      background-color: var(--color-accent-hover);
+    }
+  }
+
+  .theme-toggle:active .theme-toggle__track {
+    background-color: var(--color-accent-hover);
   }
 
   .theme-toggle__icon {

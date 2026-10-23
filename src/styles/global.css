@@ -1,4 +1,4 @@
-@layer reset, base, utilities;
+@layer reset, base, components, utilities;
 
 @layer reset {
   :where(*, *::before, *::after) {
@@ -34,14 +34,46 @@
   :root {
     color-scheme: light dark;
 
+    /*
+     * 色の役割(ライト / ダーク)。コントラスト比は背景・面に対する値
+     * - bg       ページ背景
+     * - surface  カード・帯・入力欄の面
+     * - text     本文                          ライト 17.4:1 / ダーク 14.8:1
+     * - muted    補助情報                      ライト 6.69:1 / ダーク 6.93:1
+     * - border   区切り線(装飾)
+     * - border-strong 入力欄・ボタンの境界     ライト 3.45:1 / ダーク 3.84:1(操作要素の境界 3:1 以上)
+     * - accent   主要操作・選択・ホバー         ライト 4.72:1 / ダーク 7.16:1
+     * - on-accent アクセント色の上の文字        ライト 4.72:1 / ダーク 7.86:1
+     * - error / success  状態表示(必ずアイコンと文章を併用する)
+     */
     --color-bg: light-dark(#fafafa, #161616);
     --color-surface: light-dark(#ffffff, #1f1f1f);
     --color-text: light-dark(#1a1a1a, #ececec);
     --color-muted: light-dark(#5c5c5c, #a8a8a8);
     --color-border: light-dark(#dcdcdc, #3a3a3a);
-    --color-accent: light-dark(#b35c00, #4fd1c5);
+    --color-border-strong: light-dark(#8a8a8a, #7a7a7a);
+    --color-accent: light-dark(#b35c00, #eb9849);
+    --color-accent-hover: light-dark(#954d00, #f4b47a);
+    --color-accent-subtle: color-mix(in srgb, var(--color-accent) 12%, transparent);
+    --color-on-accent: light-dark(#ffffff, #161616);
+    --color-error: light-dark(#b00020, #ff8a80);
+    --color-success: light-dark(#1b7f3b, #6fcf97);
     --color-device: light-dark(#2b2b2b, #0c0c0c);
     --focus-ring: 2px solid var(--color-accent);
+
+    /* 余白・寸法は 4 / 8 の倍数の段階だけを使う */
+    --space-4: 4px;
+    --space-8: 8px;
+    --space-12: 12px;
+    --space-16: 16px;
+    --space-24: 24px;
+    --space-32: 32px;
+    --space-40: 40px;
+    --space-48: 48px;
+
+    /* 操作要素の高さ。同じ列に並ぶ入力欄とボタンはこれにそろえる */
+    --control-height: 48px;
+    --control-height-large: 56px;
 
     /* 見出し用。英字は Cormorant Garamond、日本語は しっぽり明朝 で表示する */
     --font-heading: "Cormorant Garamond", "Shippori Mincho", serif;
@@ -60,6 +92,13 @@
   html {
     /* 固定ヘッダー(64px)の下に、ページ内リンクの移動先やフォーカスが隠れないようにする */
     scroll-padding-block-start: 80px;
+  }
+
+  /* スマホ幅ではヘッダーを固定しないので、上の余白だけ残す */
+  @media (width < 480px) {
+    html {
+      scroll-padding-block-start: var(--space-16);
+    }
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -106,7 +145,7 @@
 
   :focus-visible {
     outline: var(--focus-ring);
-    outline-offset: 3px;
+    outline-offset: 2px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -114,9 +153,99 @@
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+@layer components {
+  /*
+   * 共通ボタン(<a> と <button> の両方に使う)
+   * data-variant="primary"   主要操作。アクセント色の面
+   * data-variant="secondary" 補助操作。枠線だけ
+   * data-size="large"        ページで1つだけの主要操作に使う(高さ56px)
+   */
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+    min-block-size: var(--control-height);
+    padding-block: 0;
+    padding-inline: var(--space-24);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .button[data-size="large"] {
+    min-block-size: var(--control-height-large);
+    min-inline-size: min(280px, 100%);
+    padding-inline: var(--space-48);
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+  }
+
+  .button[data-variant="primary"] {
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .button[data-variant="secondary"] {
+    border-color: var(--color-border-strong);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .button__icon {
+    flex-shrink: 0;
+  }
+
+  @media (any-hover: hover) {
+    .button {
+      transition:
+        background-color 0.2s,
+        border-color 0.2s,
+        color 0.2s;
+    }
+
+    .button__icon {
+      transition: transform 0.2s;
+    }
+
+    .button[data-variant="primary"]:hover:not(:disabled) {
+      background-color: var(--color-accent-hover);
+    }
+
+    .button[data-variant="secondary"]:hover:not(:disabled) {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+
+    .button:hover:not(:disabled) .button__icon {
+      transform: translateX(var(--space-4));
+    }
+  }
+
+  .button[data-variant="primary"]:active:not(:disabled) {
+    background-color: var(--color-accent-hover);
+  }
+
+  .button[data-variant="secondary"]:active:not(:disabled) {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-subtle);
+  }
+
+  .button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 

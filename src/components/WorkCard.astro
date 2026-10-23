@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import DeviceMockup from "./DeviceMockup.astro";
 import StatusBadge from "./StatusBadge.astro";
+import WorkLinks from "./WorkLinks.astro";
 
 interface Props {
   work: CollectionEntry<"works">;
@@ -19,9 +20,10 @@ const href = `/works/${work.id}/`;
   <Heading id={titleId} class="work-card__title">
     <a class="work-card__link" href={href}>{work.data.title}</a>
   </Heading>
-  <div class="work-card__media">
+  <!-- タイトルと同じ行き先なので、Tabキーでは止めない -->
+  <a class="work-card__media" href={href} tabindex="-1" aria-hidden="true">
     <DeviceMockup desktop={work.data.images.desktop} mobile={work.data.images.mobile} title={work.data.title} priority={priority} />
-  </div>
+  </a>
   <div class="work-card__meta">
     <StatusBadge status={work.data.status} />
   </div>
@@ -29,15 +31,21 @@ const href = `/works/${work.id}/`;
   <ul class="work-card__tags" role="list" aria-label="使用技術">
     {work.data.tech.map(tech => <li class="work-card__tag">{tech}</li>)}
   </ul>
+  {
+    (work.data.links.demo || work.data.links.repo) && (
+      <div class="work-card__actions">
+        <WorkLinks title={work.data.title} links={work.data.links} />
+      </div>
+    )
+  }
 </article>
 
 <style>
   .work-card {
-    position: relative;
     display: grid;
-    grid-template-rows: auto auto auto 1fr auto;
-    gap: 12px;
-    padding: clamp(16px, 2svi, 24px);
+    grid-template-rows: auto auto auto 1fr auto auto;
+    gap: var(--space-12);
+    padding: var(--space-24);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     background-color: var(--color-surface);
@@ -46,7 +54,9 @@ const href = `/works/${work.id}/`;
   /* DOMは見出し始まり、見た目は画像を上にする */
   .work-card__media {
     order: 0;
-    padding-block: 8px;
+    display: block;
+    padding-block: var(--space-8);
+    border-radius: var(--radius);
   }
 
   .work-card__meta {
@@ -69,51 +79,43 @@ const href = `/works/${work.id}/`;
     order: 4;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: var(--space-8);
   }
 
   .work-card__tag {
-    padding: 2px 8px;
+    padding: var(--space-4) var(--space-8);
     border-radius: 4px;
     background-color: var(--color-bg);
     font-size: 0.75rem;
+    line-height: 16px;
+  }
+
+  .work-card__actions {
+    order: 5;
+    padding-block-start: var(--space-4);
   }
 
   .work-card__link {
     text-decoration: none;
   }
 
-  /* カード全体をクリック領域にする。モックアップ内の position 付き要素より前面に出すため z-index を付ける */
-  .work-card__link::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    border-radius: var(--radius);
-  }
-
-  .work-card:has(.work-card__link:focus-visible) {
-    outline: var(--focus-ring);
-    outline-offset: 3px;
-  }
-
-  .work-card__link:focus-visible {
-    outline: none;
-  }
-
+  /* 画像にホバーしたときも、行き先が分かるようにタイトルへ下線を出す */
   @media (any-hover: hover) {
-    .work-card {
-      transition: border-color 0.2s;
-    }
-
-    .work-card:has(.work-card__link:hover) {
-      border-color: var(--color-accent);
-    }
-
-    .work-card:has(.work-card__link:hover) .work-card__link {
+    .work-card__link:hover,
+    .work-card:has(.work-card__media:hover) .work-card__link {
       text-decoration-line: underline;
       text-decoration-color: var(--color-accent);
       text-decoration-thickness: 2px;
+    }
+  }
+
+  .work-card__link:active {
+    color: var(--color-accent);
+  }
+
+  @media (width < 480px) {
+    .work-card {
+      padding: var(--space-16);
     }
   }
 </style>

@@ -39,13 +39,19 @@ const NAV = [
   }
 
   .header__inner {
-    display: flex;
+    display: grid;
+    grid-template-areas: "logo nav toggle";
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: clamp(8px, 2svi, 32px);
+    gap: var(--space-8) var(--space-16);
     min-block-size: 64px;
   }
 
   .header__logo {
+    grid-area: logo;
+    display: flex;
+    align-items: center;
+    min-block-size: var(--control-height);
     font-family: var(--font-heading);
     font-size: 1.5rem;
     font-weight: 600;
@@ -55,19 +61,24 @@ const NAV = [
   }
 
   .header__nav {
-    margin-inline-start: auto;
+    grid-area: nav;
+    justify-self: end;
+  }
+
+  :global(.theme-toggle) {
+    grid-area: toggle;
   }
 
   .header__list {
     display: flex;
-    gap: clamp(4px, 1.5svi, 24px);
+    gap: var(--space-8);
   }
 
   .header__link {
-    display: grid;
-    place-items: center;
-    min-block-size: 44px;
-    padding-inline: 8px;
+    display: flex;
+    align-items: center;
+    min-block-size: var(--control-height);
+    padding-inline: var(--space-8);
     text-decoration: none;
     white-space: nowrap;
   }
@@ -80,34 +91,40 @@ const NAV = [
     }
   }
 
+  .header__link:active {
+    color: var(--color-accent);
+  }
+
+  /* スマホ幅: 1行目にロゴとトグル、2行目にメニュー。2段で高さが増えるため固定しない */
   @media (width < 480px) {
+    .header {
+      position: static;
+    }
+
     .header__inner {
-      gap: 4px;
+      grid-template-areas:
+        "logo toggle"
+        "nav nav";
+      grid-template-columns: 1fr auto;
+      gap: 0 var(--space-8);
+      padding-block: var(--space-8);
     }
 
     .header__logo {
-      font-size: 1.125rem;
+      font-size: 1.25rem;
+    }
+
+    .header__nav {
+      justify-self: stretch;
+      border-block-start: 1px solid var(--color-border);
     }
 
     .header__list {
-      gap: 0;
+      justify-content: space-between;
     }
 
     .header__link {
-      padding-inline: 6px;
-      font-size: 0.8125rem;
-    }
-  }
-
-  @media (width < 360px) {
-    .header__logo {
-      font-size: 1rem;
-      letter-spacing: 0;
-    }
-
-    .header__link {
-      padding-inline: 3px;
-      font-size: 0.75rem;
+      font-size: 0.875rem;
     }
   }
 </style>

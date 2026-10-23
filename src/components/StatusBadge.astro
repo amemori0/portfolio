@@ -12,13 +12,15 @@ const { status } = Astro.props;
 
 <style>
   .status-badge {
-    display: inline-block;
-    padding: 2px 10px;
+    display: inline-flex;
+    align-items: center;
+    block-size: 24px;
+    padding-inline: var(--space-12);
     border: 1px solid currentColor;
     border-radius: 999px;
     font-size: 0.75rem;
-    line-height: calc(20 / 12);
     font-weight: 700;
+    line-height: 1;
   }
 
   .status-badge[data-status="published"] {

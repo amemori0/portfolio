@@ -1,0 +1,48 @@
+---
+import Icon from "./Icon.astro";
+
+// 作品のデモ・リポジトリへのリンク。カードと詳細ページで同じ文言・順番にする
+interface Props {
+  title: string;
+  links: { demo?: string; repo?: string };
+}
+
+const { title, links } = Astro.props;
+---
+
+{
+  (links.demo || links.repo) && (
+    <ul class="work-links" role="list">
+      {links.demo && (
+        <li>
+          <a class="button work-links__button" data-variant="secondary" href={links.demo}>
+            デモを開く
+            <span class="u-sr-only">({title}、外部サイト)</span>
+            <Icon name="external" class="button__icon" />
+          </a>
+        </li>
+      )}
+      {links.repo && (
+        <li>
+          <a class="button work-links__button" data-variant="secondary" href={links.repo}>
+            <Icon name="github" />
+            コードを見る
+            <span class="u-sr-only">({title}、GitHub)</span>
+          </a>
+        </li>
+      )}
+    </ul>
+  )
+}
+
+<style>
+  .work-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+  }
+
+  .work-links__button {
+    padding-inline: var(--space-16);
+  }
+</style>

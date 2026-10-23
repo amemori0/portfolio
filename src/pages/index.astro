@@ -26,6 +26,7 @@ const SKILLS = [
         <p class="hero__eyebrow" lang="en">Portfolio</p>
         <h1 id="hero-title" class="hero__name">雨森 守浬</h1>
         <p class="hero__roman" translate="no" lang="en">Shuri Amemori</p>
+        <p class="hero__role">Webフロントエンド / WordPress テーマ開発</p>
       </hgroup>
       <HeroVisual works={works} />
     </div>
@@ -118,7 +119,13 @@ const SKILLS = [
 
   .hero__heading {
     display: grid;
-    gap: 4px;
+    gap: var(--space-8);
+  }
+
+  .hero__role {
+    margin-block-start: var(--space-8);
+    color: var(--color-muted);
+    font-size: 1rem;
   }
 
   .hero__eyebrow {

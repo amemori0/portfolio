@@ -1,183 +1,289 @@
 ---
+import Icon from "./Icon.astro";
+
 interface Props {
   endpoint: string;
 }
 
 const { endpoint } = Astro.props;
+
+const FIELDS = [
+  { id: "contact-name", name: "name", label: "お名前", type: "text", autocomplete: "name", missing: "お名前を入力してください。" },
+  { id: "contact-email", name: "email", label: "メールアドレス", type: "email", autocomplete: "email", missing: "メールアドレスを入力してください。", mismatch: "メールアドレスの形式で入力してください(例: name@example.com)。" },
+] as const;
 ---
 
 <form class="contact-form" action={endpoint} method="POST" data-contact-form>
+  {
+    FIELDS.map(field => (
+      <div class="contact-form__field">
+        <label class="contact-form__label" for={field.id}>
+          {field.label}
+          <span class="contact-form__required">必須</span>
+        </label>
+        <input
+          class="contact-form__input"
+          id={field.id}
+          name={field.name}
+          type={field.type}
+          autocomplete={field.autocomplete}
+          spellcheck={field.type === "email" ? "false" : undefined}
+          placeholder={field.type === "email" ? "name@example.com" : undefined}
+          required
+          aria-describedby={`${field.id}-error`}
+          data-missing={field.missing}
+          data-mismatch={"mismatch" in field ? field.mismatch : undefined}
+        />
+        <p class="contact-form__error" id={`${field.id}-error`}>
+          <Icon name="alert" size={16} />
+          <span data-error-text>{field.missing}</span>
+        </p>
+      </div>
+    ))
+  }
   <div class="contact-form__field">
-    <label class="contact-form__label" for="contact-name">お名前<span class="contact-form__required">必須</span></label>
-    <input class="contact-form__input" id="contact-name" name="name" type="text" autocomplete="name" required aria-describedby="contact-name-error" />
-    <p class="contact-form__error" id="contact-name-error">お名前を入力してください。</p>
-  </div>
-  <div class="contact-form__field">
-    <label class="contact-form__label" for="contact-email">メールアドレス<span class="contact-form__required">必須</span></label>
-    <input class="contact-form__input" id="contact-email" name="email" type="email" autocomplete="email" spellcheck="false" required aria-describedby="contact-email-error" />
-    <p class="contact-form__error" id="contact-email-error">メールアドレスの形式で入力してください。</p>
-  </div>
-  <div class="contact-form__field">
-    <label class="contact-form__label" for="contact-message">お問い合わせ内容<span class="contact-form__required">必須</span></label>
-    <textarea class="contact-form__input contact-form__textarea" id="contact-message" name="message" rows="6" required aria-describedby="contact-message-error"></textarea>
-    <p class="contact-form__error" id="contact-message-error">お問い合わせ内容を入力してください。</p>
+    <label class="contact-form__label" for="contact-message">
+      お問い合わせ内容
+      <span class="contact-form__required">必須</span>
+    </label>
+    <textarea class="contact-form__input contact-form__textarea" id="contact-message" name="message" rows="6" required aria-describedby="contact-message-error" data-missing="お問い合わせ内容を入力してください。"></textarea>
+    <p class="contact-form__error" id="contact-message-error">
+      <Icon name="alert" size={16} />
+      <span data-error-text>お問い合わせ内容を入力してください。</span>
+    </p>
   </div>
   <!-- スパム対策: 人には見えない項目。値が入っていたらFormspreeが破棄する -->
   <input class="u-sr-only" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" />
   <input type="hidden" name="_subject" value="ポートフォリオサイトからのお問い合わせ" />
-  <button class="contact-form__submit" type="submit">
-    <span class="contact-form__submit-label">送信する</span>
-    <svg class="contact-form__submit-icon" aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M5 12h14M13 6l6 6-6 6"></path>
-    </svg>
+  <button class="button contact-form__submit" data-variant="primary" data-size="large" type="submit">
+    <Icon name="spinner" class="contact-form__spinner" />
+    <span data-submit-label>送信する</span>
+    <Icon name="arrow-right" class="button__icon contact-form__arrow" />
   </button>
-  <p class="contact-form__result" data-contact-result role="status"></p>
+  <div class="contact-form__result" data-contact-result aria-live="polite" tabindex="-1">
+    <Icon name="check" class="contact-form__result-icon" data-for="success" />
+    <Icon name="alert" class="contact-form__result-icon" data-for="error" />
+    <p data-result-text></p>
+  </div>
 </form>
 
 <script>
+  type Control = HTMLInputElement | HTMLTextAreaElement;
+
   const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
-  const result = form?.querySelector<HTMLElement>("[data-contact-result]");
 
-  form?.addEventListener("submit", async event => {
-    // required 属性の検証はブラウザが先に行うため、ここに来るのは入力が揃っているときだけ
-    event.preventDefault();
+  if (form) {
+    // JS が動くときは独自の表示で検証する。動かないときはブラウザ標準の検証が働く
+    form.noValidate = true;
+    const controls = [...form.querySelectorAll<Control>("[required]")];
     const submitButton = form.querySelector<HTMLButtonElement>("[type='submit']");
-    if (!submitButton || !result) return;
+    const submitLabel = form.querySelector<HTMLElement>("[data-submit-label]");
+    const result = form.querySelector<HTMLElement>("[data-contact-result]");
+    const resultText = result?.querySelector<HTMLElement>("[data-result-text]");
 
-    submitButton.disabled = true;
-    result.setAttribute("role", "status");
-    delete result.dataset.state;
-    result.textContent = "送信しています…";
+    const validate = (control: Control): boolean => {
+      const valid = control.checkValidity();
+      const errorText = document.getElementById(`${control.id}-error`)?.querySelector<HTMLElement>("[data-error-text]");
+      if (!valid && errorText) {
+        errorText.textContent = control.validity.typeMismatch ? (control.dataset.mismatch ?? "") : (control.dataset.missing ?? "");
+      }
+      control.setAttribute("aria-invalid", String(!valid));
+      return valid;
+    };
 
-    try {
-      const response = await fetch(form.action, {
-        method: "POST",
-        body: new FormData(form),
-        headers: { Accept: "application/json" },
+    // 一度エラーになった欄は、入力のたびに再確認してエラーを消す
+    controls.forEach(control => {
+      control.addEventListener("input", () => {
+        if (control.getAttribute("aria-invalid") === "true") validate(control);
       });
-      if (!response.ok) throw new Error(`Formspree responded ${response.status}`);
-      form.reset();
-      result.dataset.state = "success";
-      result.textContent = "送信しました。お問い合わせありがとうございます。";
-    } catch (error) {
-      console.error(error);
-      result.setAttribute("role", "alert");
-      result.dataset.state = "error";
-      result.textContent = "送信に失敗しました。時間をおいて再度お試しください。";
-    } finally {
-      submitButton.disabled = false;
-    }
-  });
+      control.addEventListener("blur", () => {
+        if (control.value !== "") validate(control);
+      });
+    });
+
+    const showResult = (state: "success" | "error", message: string) => {
+      if (!result || !resultText) return;
+      result.dataset.state = state;
+      resultText.textContent = message;
+      result.focus();
+    };
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      const invalid = controls.filter(control => !validate(control));
+      if (invalid.length > 0) {
+        invalid[0].focus();
+        return;
+      }
+      if (!submitButton || !submitLabel || !result) return;
+
+      form.dataset.state = "sending";
+      form.setAttribute("aria-busy", "true");
+      submitButton.disabled = true;
+      submitLabel.textContent = "送信中…";
+      delete result.dataset.state;
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+        if (!response.ok) throw new Error(`Formspree responded ${response.status}`);
+        form.reset();
+        controls.forEach(control => control.removeAttribute("aria-invalid"));
+        showResult("success", "お問い合わせを送信しました。入力いただいたメールアドレスに返信します。");
+      } catch (error) {
+        console.error(error);
+        showResult("error", "送信できませんでした。通信環境を確認して、もう一度「送信する」を押してください。入力内容は残っています。");
+      } finally {
+        delete form.dataset.state;
+        form.removeAttribute("aria-busy");
+        submitButton.disabled = false;
+        submitLabel.textContent = "送信する";
+      }
+    });
+  }
 </script>
 
 <style>
   .contact-form {
     display: grid;
-    gap: 24px;
+    gap: var(--space-24);
     max-inline-size: min(40em, 100%);
   }
 
   .contact-form__field {
     display: grid;
-    gap: 8px;
+    gap: var(--space-8);
   }
 
   .contact-form__label {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-8);
     font-weight: 700;
   }
 
   .contact-form__required {
-    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    block-size: 20px;
+    padding-inline: var(--space-8);
     border-radius: 4px;
     background-color: var(--color-accent);
-    color: var(--color-bg);
+    color: var(--color-on-accent);
     font-size: 0.75rem;
+    line-height: 1;
   }
 
   .contact-form__input {
-    min-block-size: 44px;
-    padding: 10px 12px;
-    border: 1px solid var(--color-border);
+    block-size: var(--control-height);
+    padding-block: 0;
+    padding-inline: var(--space-12);
+    border: 1px solid var(--color-border-strong);
     border-radius: var(--radius);
     background-color: var(--color-surface);
     font-size: 1rem;
   }
 
   .contact-form__textarea {
+    block-size: auto;
+    min-block-size: calc(6lh + 2 * var(--space-12));
+    padding-block: var(--space-12);
     field-sizing: content;
-    min-block-size: 8lh;
     resize: vertical;
   }
 
+  .contact-form__input::placeholder {
+    color: var(--color-muted);
+  }
+
+  @media (any-hover: hover) {
+    .contact-form__input:hover {
+      border-color: var(--color-text);
+    }
+  }
+
   .contact-form__input:focus-visible {
+    border-color: var(--color-accent);
     outline: var(--focus-ring);
-    outline-offset: 1px;
+    outline-offset: 0;
+  }
+
+  /* エラー: JSあり=aria-invalid、JSなし=:user-invalid。色だけでなくアイコンと文章で示す */
+  .contact-form__input[aria-invalid="true"],
+  .contact-form:not([novalidate]) .contact-form__input:user-invalid {
+    border-color: var(--color-error);
   }
 
   .contact-form__error {
     display: none;
-    color: light-dark(#b00020, #ff8a80);
+    align-items: center;
+    gap: var(--space-4);
+    color: var(--color-error);
     font-size: 0.875rem;
   }
 
-  .contact-form__input:user-invalid {
-    border-color: light-dark(#b00020, #ff8a80);
-  }
-
-  .contact-form__field:has(:user-invalid) .contact-form__error {
-    display: block;
+  .contact-form__field:has([aria-invalid="true"]) .contact-form__error,
+  .contact-form:not([novalidate]) .contact-form__field:has(:user-invalid) .contact-form__error {
+    display: flex;
   }
 
   .contact-form__submit {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     justify-self: center;
-    gap: 12px;
-    min-inline-size: min(280px, 100%);
-    min-block-size: 60px;
-    padding-inline: 48px;
-    border: 0;
-    border-radius: 999px;
-    background-color: var(--color-text);
-    color: var(--color-bg);
-    font-size: 1.0625rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    cursor: pointer;
   }
 
-  .contact-form__submit:disabled {
-    opacity: 0.6;
+  /* Icon は子の部品なので、スコープ外のクラスとして :global で指定する */
+  .contact-form__submit :global(.contact-form__spinner) {
+    display: none;
+  }
+
+  .contact-form[data-state="sending"] :global(.contact-form__spinner) {
+    display: block;
+  }
+
+  .contact-form[data-state="sending"] :global(.contact-form__arrow) {
+    display: none;
+  }
+
+  .contact-form[data-state="sending"] .contact-form__submit:disabled {
     cursor: wait;
   }
 
-  /* ホバーでボタンを少し浮かせ、矢印を右へ動かす(transform だけを動かす) */
-  @media (any-hover: hover) {
-    .contact-form__submit {
-      transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease;
-    }
+  .contact-form__result {
+    display: none;
+    align-items: flex-start;
+    gap: var(--space-8);
+    padding: var(--space-16);
+    border: 1px solid currentColor;
+    border-radius: var(--radius);
+    background-color: var(--color-surface);
+  }
 
-    .contact-form__submit-icon {
-      transition: transform 0.25s ease;
-    }
+  .contact-form__result[data-state] {
+    display: flex;
+  }
 
-    .contact-form__submit:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px color-mix(in srgb, var(--color-text) 25%, transparent);
-    }
-
-    .contact-form__submit:hover:not(:disabled) .contact-form__submit-icon {
-      transform: translateX(4px);
-    }
+  .contact-form__result[data-state="success"] {
+    color: var(--color-success);
   }
 
   .contact-form__result[data-state="error"] {
-    color: light-dark(#b00020, #ff8a80);
+    color: var(--color-error);
+  }
+
+  .contact-form__result :global(.contact-form__result-icon) {
+    display: none;
+    margin-block-start: var(--space-4);
+  }
+
+  .contact-form__result[data-state="success"] :global([data-for="success"]),
+  .contact-form__result[data-state="error"] :global([data-for="error"]) {
+    display: block;
+  }
+
+  .contact-form__result p {
+    color: var(--color-text);
   }
 </style>

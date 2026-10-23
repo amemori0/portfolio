@@ -3,6 +3,8 @@ import { getCollection, type CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import DeviceMockup from "../../components/DeviceMockup.astro";
 import StatusBadge from "../../components/StatusBadge.astro";
+import WorkLinks from "../../components/WorkLinks.astro";
+import Icon from "../../components/Icon.astro";
 
 export async function getStaticPaths() {
   const works = await getCollection("works");
@@ -15,14 +17,15 @@ interface Props {
 
 const { work } = Astro.props;
 const { title, summary, role, tech, links, images, status } = work.data;
+const hasLinks = Boolean(links.demo || links.repo);
 ---
 
 <BaseLayout title={title} description={summary}>
   <article class="work l-container" aria-labelledby="work-title">
-    <nav class="work__breadcrumb" aria-label="パンくずリスト">
+    <nav aria-label="パンくずリスト">
       <ol role="list" class="breadcrumb">
-        <li><a href="/">トップ</a></li>
-        <li><a href="/#works">Works</a></li>
+        <li><a class="breadcrumb__link" href="/">トップ</a></li>
+        <li><a class="breadcrumb__link" href="/#works">Works</a></li>
         <li aria-current="page">{title}</li>
       </ol>
     </nav>
@@ -31,6 +34,7 @@ const { title, summary, role, tech, links, images, status } = work.data;
       <StatusBadge status={status} />
       <h1 id="work-title" class="work__title">{title}</h1>
       <p class="work__summary">{summary}</p>
+      {hasLinks ? <WorkLinks title={title} links={links} /> : <p class="work__note">公開の準備中のため、デモとコードはまだ公開していません。</p>}
     </header>
 
     <DeviceMockup desktop={images.desktop} mobile={images.mobile} title={title} size="large" priority />
@@ -48,59 +52,48 @@ const { title, summary, role, tech, links, images, status } = work.data;
           </ul>
         </dd>
       </div>
-      {
-        (links.demo || links.repo) && (
-          <div class="work__fact">
-            <dt>リンク</dt>
-            <dd>
-              <ul class="work__links" role="list">
-                {links.demo && (
-                  <li>
-                    <a class="work__button" href={links.demo}>
-                      デモサイトを見る<span class="u-sr-only">({title})</span>
-                    </a>
-                  </li>
-                )}
-                {links.repo && (
-                  <li>
-                    <a class="work__button" href={links.repo}>
-                      GitHubでコードを見る<span class="u-sr-only">({title})</span>
-                    </a>
-                  </li>
-                )}
-              </ul>
-            </dd>
-          </div>
-        )
-      }
     </dl>
+
+    <p>
+      <a class="button work__back" data-variant="secondary" href="/#works">
+        <Icon name="arrow-right" class="button__icon work__back-icon" />
+        作品一覧に戻る
+      </a>
+    </p>
   </article>
 </BaseLayout>
 
 <style>
   .work {
     display: grid;
-    gap: clamp(24px, 4svi, 48px);
-    padding-block-start: 24px;
+    gap: var(--space-40);
+    padding-block-start: var(--space-24);
   }
 
   .breadcrumb {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 8px;
+    align-items: center;
+    gap: 0 var(--space-8);
     color: var(--color-muted);
     font-size: 0.875rem;
   }
 
   .breadcrumb > li:not(:last-child)::after {
     content: "/";
-    margin-inline-start: 8px;
+    margin-inline-start: var(--space-8);
+  }
+
+  .breadcrumb__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--control-height);
   }
 
   .work__header {
     display: grid;
     justify-items: start;
-    gap: 12px;
+    gap: var(--space-16);
   }
 
   .work__title {
@@ -113,6 +106,14 @@ const { title, summary, role, tech, links, images, status } = work.data;
     color: var(--color-muted);
   }
 
+  .work__note {
+    padding: var(--space-12) var(--space-16);
+    border-inline-start: 4px solid var(--color-border-strong);
+    background-color: var(--color-surface);
+    color: var(--color-muted);
+    font-size: 0.9375rem;
+  }
+
   .work__facts {
     display: grid;
     border-block-start: 1px solid var(--color-border);
@@ -121,8 +122,8 @@ const { title, summary, role, tech, links, images, status } = work.data;
   .work__fact {
     display: grid;
     grid-template-columns: 8em 1fr;
-    gap: 8px 24px;
-    padding-block: 16px;
+    gap: var(--space-8) var(--space-24);
+    padding-block: var(--space-16);
     border-block-end: 1px solid var(--color-border);
   }
 
@@ -130,41 +131,23 @@ const { title, summary, role, tech, links, images, status } = work.data;
     font-weight: 700;
   }
 
-  .work__tags,
-  .work__links {
+  .work__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--space-8);
   }
 
   .work__tag {
-    padding: 2px 8px;
+    padding: var(--space-4) var(--space-8);
     border-radius: 4px;
     background-color: var(--color-surface);
     font-size: 0.875rem;
+    line-height: 20px;
   }
 
-  .work__button {
-    display: inline-flex;
-    align-items: center;
-    min-block-size: 44px;
-    padding-inline: 20px;
-    border: 1px solid var(--color-text);
-    border-radius: 999px;
-    text-decoration: none;
-  }
-
-  @media (any-hover: hover) {
-    .work__button {
-      transition:
-        background-color 0.2s,
-        color 0.2s;
-    }
-
-    .work__button:hover {
-      background-color: var(--color-text);
-      color: var(--color-bg);
-    }
+  /* 右向きの矢印を左右反転して「戻る」に使う。ホバー時の移動(共通ボタンの transform)も反転して左へ動く */
+  .work__back :global(.work__back-icon) {
+    scale: -1 1;
   }
 
   @media (width < 640px) {
